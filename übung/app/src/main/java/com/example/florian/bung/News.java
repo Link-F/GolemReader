@@ -1,6 +1,7 @@
 package com.example.florian.bung;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,23 +19,26 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by florian on 17.05.16.
  */
 public class News {
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+    public JSONArray data = new JSONArray();
+
     public class worker extends AsyncTask<Void, Void, String> {
 
-        private JSONArray data;
 
-        worker(){
+        worker() {
 
         }
 
         @Override
         protected String doInBackground(Void... params) {
-            try
-            {
+            try {
                 HttpClient client = new DefaultHttpClient();
                 URI website = new URI("http://api.golem.de/api/article/latest/limit/?key=6ea752bf080139b5507ef7b6245dc710&format=json");
                 HttpGet request = new HttpGet();
@@ -46,8 +50,7 @@ public class News {
 
                 JSONObject object = new JSONObject(EntityUtils.toString(e));
                 return object.toString();
-            }
-            catch(URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 e.printStackTrace();
             } catch (ClientProtocolException e) {
                 e.printStackTrace();
@@ -72,10 +75,8 @@ public class News {
                     text.setText("\n\nKein Artikel gefunden");
                 }*/
 
-                this.data =  object.getJSONArray("data");
-
-            }
-            catch (JSONException e) {
+                data = object.getJSONArray("data");
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
@@ -83,47 +84,54 @@ public class News {
     }
 
 
-    public Article[] getLatestNews() throws JSONException {
+    public Article[] getLatestNews() throws JSONException, ExecutionException, InterruptedException {
         worker myworker = new worker();
-        myworker.execute();
+        JSONObject json = new JSONObject(myworker.execute().get());
+        this.data = json.getJSONArray("data");
 
+        Log.d(TAG, "!!myworker.data.length=" + data.length());
         // Article Array von der Größe des Data Arrays
-        Article[] latestArticle = new Article[myworker.data.length()];
+        Article[] latestArticle = new Article[this.data.length()];
 
-        for(int i=0; i< myworker.data.length();i++){
+        for (int i = 0; i < this.data.length(); i++) {
             // Pro Schleifendurchgang ein JSONObjekt aus dem JSONArray holen
-            JSONObject temp = myworker.data.getJSONObject(i);
+            JSONObject temp = this.data.getJSONObject(i);
+
+            Log.d(TAG,"!!article.headline="+temp.getString("headline"));
 
             // Pro JSONObjekt gibt es nochmals ein JSONArray mit den Bildinformationen
             JSONArray images = temp.getJSONArray("leadimg");
 
-                    // Diese Bildinformationen holen wir aus einem JSON Array und speichern sie
-                    String image_url[] = new String[images.length()];
-                    int image_width[] = new int[images.length()];
-                    int image_height[] = new int[images.length()];
-                    for(int x=0; x<images.length();x++){
-                        JSONObject image = images.getJSONObject(i);
-                        image_url[x] = image.getString("url");
-                        image_width[x] = Integer.parseInt(image.getString("width"));
-                        image_height[x] = Integer.parseInt(image.getString("height"));
-                    }
+            // Diese Bildinformationen holen wir aus einem JSON Array und speichern sie
+            String image_url[] = new String[images.length()];
+            int image_width[] = new int[images.length()];
+            int image_height[] = new int[images.length()];
+            for (int x = 0; x < images.length(); x++) {
+                JSONObject image = images.getJSONObject(i);
+                image_url[x] = image.getString("url");
+                image_width[x] = Integer.parseInt(image.getString("width"));
+                image_height[x] = Integer.parseInt(image.getString("height"));
+            }
             // Aus diesen ganzen Daten wird nun ein Article Objekt zusammengebaut
             Article article = new Article(temp.getInt("articleid"),
-                                            temp.getString("headline"),
-                                            temp.getString("abstracttext"),
-                                            temp.getString("url"),
-                                            temp.getString("date"),
-                                            image_url,
-                                            image_width,
-                                            image_height
-                    );
+                    temp.getString("headline"),
+                    temp.getString("abstracttext"),
+                    temp.getString("url"),
+                    temp.getString("date"),
+                    image_url,
+                    image_width,
+                    image_height
+            );
             // Pro Schleifendurchlauf wird ein Article Objekt erstellt und in das latestArticle Array beigefügt
             latestArticle[i] = article;
+        Log.d(TAG,"!!!!!!headline:"+latestArticle[i].headline);
         }
         return latestArticle;
-    }
 
+    }
 }
+
+
 
 
 
