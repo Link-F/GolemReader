@@ -40,7 +40,7 @@ public class News {
         protected String doInBackground(Void... params) {
             try {
                 HttpClient client = new DefaultHttpClient();
-                URI website = new URI("http://api.golem.de/api/article/latest/limit/?key=6ea752bf080139b5507ef7b6245dc710&format=json");
+                URI website = new URI("http://api.golem.de/api/article/latest/15/?key=6ea752bf080139b5507ef7b6245dc710&format=json");
                 HttpGet request = new HttpGet();
                 request.setURI(website);
 
@@ -100,10 +100,10 @@ public class News {
             Log.d(TAG,"!!article.headline="+temp.getString("headline"));
 
             // Pro JSONObjekt gibt es nochmals ein JSONArray mit den Bildinformationen
-            JSONArray images = temp.getJSONArray("leadimg");
+            JSONObject image = temp.getJSONObject("leadimg");
 
             // Diese Bildinformationen holen wir aus einem JSON Array und speichern sie
-            String image_url[] = new String[images.length()];
+            /*String image_url[] = new String[images.length()];
             int image_width[] = new int[images.length()];
             int image_height[] = new int[images.length()];
             for (int x = 0; x < images.length(); x++) {
@@ -111,19 +111,22 @@ public class News {
                 image_url[x] = image.getString("url");
                 image_width[x] = Integer.parseInt(image.getString("width"));
                 image_height[x] = Integer.parseInt(image.getString("height"));
-            }
+            }*/
+
+
+
             // Aus diesen ganzen Daten wird nun ein Article Objekt zusammengebaut
-            Article article = new Article(temp.getInt("articleid"),
+            latestArticle[i] = new Article(temp.getInt("articleid"),
                     temp.getString("headline"),
                     temp.getString("abstracttext"),
                     temp.getString("url"),
                     temp.getString("date"),
-                    image_url,
-                    image_width,
-                    image_height
+                    image.getString("url"),
+                    Integer.parseInt(image.getString("width")),
+                    Integer.parseInt(image.getString("height"))
             );
             // Pro Schleifendurchlauf wird ein Article Objekt erstellt und in das latestArticle Array beigefügt
-            latestArticle[i] = article;
+
         Log.d(TAG,"!!!!!!headline:"+latestArticle[i].headline);
         }
         return latestArticle;

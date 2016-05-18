@@ -9,18 +9,21 @@ public class Article {
     public String abstract_text = new String();
     public String url = new String();
     public String date = new String();
-    public String image_url[];
-    public int image_width[];
-    public int image_height[];
+    //public String image_url[];
+    //public int image_width[];
+    //public int image_height[];
+    public String image_url;
+    public int image_width;
+    public int image_height;
 
     public Article(int id,
                    String headline,
                    String abstract_text,
                    String url,
                    String date,
-                   String image_url[],
-                   int image_height[],
-                   int image_width[]){
+                   String image_url,
+                   int image_height,
+                   int image_width){
         this.article_id = id;
         this.headline = headline;
         this.abstract_text = abstract_text;
