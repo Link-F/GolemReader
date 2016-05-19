@@ -1,10 +1,12 @@
 package com.example.florian.bung;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,15 +23,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    Article[] latest_articles = new Article[5];
+    // Asynchroner Worker der ein Artikelbild runterlädt
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
 
             // Die neuesten Artikel in die latest_articles Klassenvariable schreiben
             News news = new News();
-            Article[] latest_articles = new Article[5];
         try {
             latest_articles = news.getLatestNews();
         } catch (JSONException e) {
@@ -73,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 // ID der Reihe setzen
-                views[i].setId(latest_articles[i].article_id);
+                views[i].setId(i);
                 views[i].setSingleLine(false);
                 views[i].setBackgroundResource(R.drawable.row_border);
 
@@ -82,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(getApplicationContext(), ArticleDetails.class);
-                        intent.putExtra("ArticleID", v.getId());
+
+                        // Artikel id an die nächste Activity weitergeben
+                        intent.putExtra("article_id",getArticle(v.getId()));
 
                         // Startet die ViewTrack Activity
                         startActivity(intent);
@@ -97,22 +107,38 @@ public class MainActivity extends AppCompatActivity {
                         (RadioGroup.LayoutParams.WRAP_CONTENT,
                                 RadioGroup.LayoutParams.WRAP_CONTENT);
 
-                Log.d(TAG,"!!!!!ImageURL:"+latest_articles[i].image_url);
-                /*Bitmap bmp = null;
-                try {
-                    URL url = new URL(latest_articles[i].image_url);
-                    bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
-                // Das endgültige Layout mit Bild zusammenbauen und hinzufügen
-                imageViews[i].setImageBitmap(bmp);
+                // Die Bild URL als Tag setzen
+                imageViews[i].setTag(latest_articles[i].image_url);
+
+                // Das Bild mit dem Worker runterladen und in den ImageView setzen
+                ImageLoad task = new ImageLoad();
+                task.execute(imageViews[i]);
+
+                // Höhe und Breite des Artikelbildes setzen
+                android.view.ViewGroup.LayoutParams layoutParams = new ActionBar.LayoutParams(
+                        latest_articles[i].image_width,
+                        latest_articles[i].image_height);
+
+                imageViews[i].setLayoutParams(layoutParams);
+
                 container.addView(imageViews[i]);
                 views[i].setText(text);
                 views[i].setPadding(10, 20, 10, 20);
-                container.addView(views[i], params);*/
+                container.addView(views[i], params);
             }
     }
 
+    ArrayList<String> getArticle(int i){
+        ArrayList<String> Article = new ArrayList<String>(10);
+
+        Article.add(this.latest_articles[i].headline);
+        Article.add(this.latest_articles[i].abstract_text);
+        Article.add(this.latest_articles[i].image_url);
+        Article.add(String.valueOf(this.latest_articles[i].image_width));
+        Article.add(String.valueOf(this.latest_articles[i].image_height));
+        Article.add(this.latest_articles[i].url);
+
+        return Article;
+    }
 }

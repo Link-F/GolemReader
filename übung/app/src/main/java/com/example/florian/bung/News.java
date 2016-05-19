@@ -30,10 +30,7 @@ public class News {
     public JSONArray data = new JSONArray();
 
     public class worker extends AsyncTask<Void, Void, String> {
-
-
         worker() {
-
         }
 
         @Override
@@ -101,19 +98,6 @@ public class News {
 
             // Pro JSONObjekt gibt es nochmals ein JSONArray mit den Bildinformationen
             JSONObject image = temp.getJSONObject("leadimg");
-
-            // Diese Bildinformationen holen wir aus einem JSON Array und speichern sie
-            /*String image_url[] = new String[images.length()];
-            int image_width[] = new int[images.length()];
-            int image_height[] = new int[images.length()];
-            for (int x = 0; x < images.length(); x++) {
-                JSONObject image = images.getJSONObject(i);
-                image_url[x] = image.getString("url");
-                image_width[x] = Integer.parseInt(image.getString("width"));
-                image_height[x] = Integer.parseInt(image.getString("height"));
-            }*/
-
-
 
             // Aus diesen ganzen Daten wird nun ein Article Objekt zusammengebaut
             latestArticle[i] = new Article(temp.getInt("articleid"),
