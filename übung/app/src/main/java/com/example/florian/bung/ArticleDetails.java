@@ -8,7 +8,10 @@ import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -46,14 +49,19 @@ public class ArticleDetails extends AppCompatActivity {
         pDialog.show();
 
         // Referenz auf Layout holen
-        RelativeLayout layout = (RelativeLayout)findViewById(R.id.relativelayoutdetails);
+        LinearLayout layout = (LinearLayout)findViewById(R.id.LinearLayout);
+        layout.setOrientation(LinearLayout.VERTICAL);
 
-        TextView view = new TextView(this);
+
+        TextView contentview = new TextView(this);
+        TextView headview = new TextView(this);
         ImageView image = new ImageView(this);
 
 
         try {
-            setArticle();
+            Intent intent = getIntent();
+            int article_id = intent.getIntExtra("article_id", 0);
+            setArticle(article_id);
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -62,15 +70,21 @@ public class ArticleDetails extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Höhe und Breite des Artikelbildes setzen
-        android.view.ViewGroup.LayoutParams layoutParams = new ActionBar.LayoutParams(
-                article.image_width,
-                article.image_height);
+
+        // Eigenschaften des Image View setzen
+        LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(
+                article.image_width*3,
+                article.image_height*3);
+
+        layoutParams.gravity= Gravity.CENTER;
         image.setLayoutParams(layoutParams);
 
+
         // View Parameter
-        view.setSingleLine(false);
+        contentview.setSingleLine(false);
+        headview.setSingleLine(false);
         //view.setBackgroundResource(R.drawable.row_border);
+
 
         // Die Bild URL als Tag setzen
         image.setTag(article.image_url);
@@ -79,12 +93,19 @@ public class ArticleDetails extends AppCompatActivity {
         ImageLoad task = new ImageLoad();
         task.execute(image);
 
-        // Artikel in den Textview setzen
-        view.setText(article.headline + "\n\n\n" + article.subheadline + "\n\n\n" + article.abstract_text);
+
+        // extview EigenschaftenT
+        headview.setText(article.headline);
+        headview.setTextSize(20);
+        headview.setGravity(Gravity.CENTER);
+
+        contentview.setText(article.subheadline + "\n\n\n" + article.abstract_text);
+        contentview.setGravity(Gravity.CENTER);
 
         // Viewws in das Layout setzen
         layout.addView(image);
-        layout.addView(view);
+        layout.addView(headview);
+        layout.addView(contentview);
 
         new CountDownTimer(500, 1000) {
 
@@ -148,42 +169,69 @@ public class ArticleDetails extends AppCompatActivity {
         }
     }
 
-    public void setArticle() throws JSONException, ExecutionException, InterruptedException {
+    public void setArticle(int article_id) throws JSONException, ExecutionException, InterruptedException {
 
-        // Artikel id holen
-        Intent intent = getIntent();
-        int article_id = intent.getIntExtra("article_id", 0);
-
-        Log.d(TAG,"!!!Artikel ID:"+ article_id);
         worker myworker = new worker();
         myworker.article_id = article_id;
-        JSONObject json = new JSONObject(myworker.execute().get());
-        JSONArray data = json.getJSONArray("data");
+
+        JSONObject object = new JSONObject(myworker.execute().get());
+        //JSONArray data = json.getJSONArray("data");
+
+        JSONObject temp = object.getJSONObject("data");
+
+        Log.d(TAG,"!!!DEBUGasdfasdf:"+ temp.getString("headline"));
 
 
-
-        // Pro Schleifendurchgang ein JSONObjekt aus dem JSONArray holen
-        JSONObject temp = data.getJSONObject(0);
-
-
-        // Pro JSONObjekt gibt es nochmals ein JSONArray mit den Bildinformationen
+        // Pro JSONObjekt gibt es nochmals ein JSONObjekt mit den Bildinformationen
         JSONObject image = temp.getJSONObject("leadimg");
 
-        // Aus diesen ganzen Daten wird nun ein Article Objekt zusammengebaut
-        Article article = new Article(temp.getInt("articleid"),
-                temp.getString("headline"),
-                temp.getString("subheadline"),
-                temp.getString("abstracttext"),
-                temp.getString("url"),
-                temp.getString("date"),
-                image.getString("url"),
-                Integer.parseInt(image.getString("width")),
-                Integer.parseInt(image.getString("height")),
-                Integer.parseInt(temp.getString("pages"))
-        );
-        Log.d(TAG,"!!!Debug"+article.headline);
-        this.article = article;
+        //JSONArray image_arr = temp.getJSONArray("leadimg");
 
+
+        /*if(Boolean.parseBoolean(String.valueOf(image_arr.length()))) {
+
+            int[] width_arr = new int[image_arr.length()];
+            int[] height_arr = new int[image_arr.length()];
+            String[] image_url_arr = new String[image_arr.length()];
+
+            for (int i = 0; i < image_arr.length(); i++) {
+
+                JSONObject image_obj = image_arr.getJSONObject(i);
+
+                width_arr[i] = Integer.parseInt(image_obj.getString("width"));
+                height_arr[i] = Integer.parseInt(image_obj.getString("height"));
+                image_url_arr[i] = image_obj.getString("url");
+            }
+            // Aus diesen ganzen Daten wird nun ein Article Objekt zusammengebaut
+            Article article = new Article(temp.getInt("articleid"),
+                    temp.getString("headline"),
+                    temp.getString("subheadline"),
+                    temp.getString("abstracttext"),
+                    temp.getString("url"),
+                    temp.getString("date"),
+                    image_url_arr,
+                    width_arr,
+                    height_arr,
+                    Integer.parseInt(temp.getString("pages"))
+            );
+            Log.d(TAG,"!!!Debug"+article.headline);
+            this.article = article;
+        }
+        else
+        {*/
+
+            // Aus diesen ganzen Daten wird nun ein Article Objekt zusammengebaut
+            Article article = new Article(temp.getInt("articleid"),
+                    temp.getString("headline"),
+                    temp.getString("subheadline"),
+                    temp.getString("abstracttext"),
+                    temp.getString("url"),
+                    temp.getString("date"),
+                    image.getString("url"),
+                    Integer.parseInt(image.getString("width")),
+                    Integer.parseInt(image.getString("height")),
+                    Integer.parseInt(temp.getString("pages"))
+            );
+            this.article = article;
     }
-
 }
