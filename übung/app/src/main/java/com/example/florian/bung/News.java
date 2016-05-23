@@ -2,8 +2,6 @@ package com.example.florian.bung;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

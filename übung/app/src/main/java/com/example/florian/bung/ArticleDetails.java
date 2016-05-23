@@ -1,18 +1,16 @@
 package com.example.florian.bung;
 
-import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
@@ -22,10 +20,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.net.URI;
@@ -106,6 +102,14 @@ public class ArticleDetails extends AppCompatActivity {
         layout.addView(image);
         layout.addView(headview);
         layout.addView(contentview);
+
+        final TextView link = new TextView(this);
+        link.setText(article.url);
+        Linkify.addLinks(link, Linkify.WEB_URLS);
+
+        link.setGravity(Gravity.CENTER);
+        layout.addView(link);
+
 
         new CountDownTimer(500, 1000) {
 

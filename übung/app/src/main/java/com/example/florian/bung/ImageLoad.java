@@ -9,9 +9,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Created by florian on 19.05.16.
- */
+
 public class ImageLoad extends AsyncTask<ImageView, Void, Bitmap> {
 
     ImageView imageView = null;

@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
@@ -107,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             imageViews[i].setLayoutParams(layoutParams);
+            imageViews[i].setPadding(5,5,5,5);
 
             // Den Unix timestamp aus dem Artikel in ein Datum umwandeln
             Date date = new Date(Integer.parseInt(latest_articles[i].date)*1000L);
@@ -116,7 +116,9 @@ public class MainActivity extends AppCompatActivity {
 
             // Texte in die Views setzen
             headviews[i].setText(latest_articles[i].headline);
+            headviews[i].setTextSize(16);
             contentviews[i].setText(latest_articles[i].abstract_text + "\n\n" + formattedDate);
+            contentviews[i].setPadding(5,5,5,5);
 
 
 
