@@ -2,6 +2,7 @@ package com.example.florian.GolemReader;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Gravity;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,6 +34,7 @@ import java.util.concurrent.ExecutionException;
 public class ArticleDetails extends AppCompatActivity {
 
     public Article article;
+    public String api_key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,8 @@ public class ArticleDetails extends AppCompatActivity {
         final ProgressDialog pDialog = new ProgressDialog(this);
         pDialog.setMessage("Loading Article ....");
         pDialog.show();
+
+        this.api_key = getString(R.string.api_key);
 
         // Get the article by article_id
         try {
@@ -54,10 +59,10 @@ public class ArticleDetails extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Set the WebView url
-        WebView webview = (WebView) findViewById(R.id.WebView);
-        setContentView(webview);
-        webview.loadUrl(article.url);
+        // Set the WebView
+        WebView Web = (WebView) findViewById(R.id.WebView);
+        Web.setWebViewClient(new WebViewClient());
+        Web.loadUrl(article.url);
 
         new CountDownTimer(500, 1000) {
 
@@ -78,12 +83,20 @@ public class ArticleDetails extends AppCompatActivity {
     public class worker extends AsyncTask<Void, Void, String> {
 
         public int article_id;
+        public String api_key;
+
+        public worker(String api_key) {
+            this.api_key = api_key;
+        }
 
         @Override
         protected String doInBackground(Void... params) {
             try {
+
                 HttpClient client = new DefaultHttpClient();
-                URI website = new URI("http://api.golem.de/api/article/meta/"+article_id+"/?key="+R.string.api_key+"&format=json");
+
+                URI website = new URI("http://api.golem.de/api/article/meta/"+article_id+"/?key="+this.api_key+"&format=json");
+
                 HttpGet request = new HttpGet();
                 request.setURI(website);
 
@@ -119,7 +132,7 @@ public class ArticleDetails extends AppCompatActivity {
 
     public void setArticle(int article_id) throws JSONException, ExecutionException, InterruptedException {
 
-        worker myworker = new worker();
+        worker myworker = new worker(this.api_key);
         myworker.article_id = article_id;
 
         JSONObject object = new JSONObject(myworker.execute().get());
