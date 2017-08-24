@@ -29,7 +29,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
             // Load the newest articles
-            News news = new News();
+            News news = new News(
+                    getString(R.string.api_key),
+                    getString(R.string.articles)
+            );
+
         try {
             // Save the newest articles in latest_articles
             this.latest_articles = news.getLatestNews();
@@ -75,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getApplicationContext(), ArticleDetails.class);
-                    Log.d(TAG,"!!!Artikel ID Übergabe"+v.getId());
+
                     // Give the article id to the next activity
                     intent.putExtra("article_id", v.getId());
 
@@ -89,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Load the picture with the worker and set it in ImageView
             ImageLoad task = new ImageLoad(imageViews[i].getTag().toString());
+
             task.execute(imageViews[i]);
 
             // Set the width and height of the image
