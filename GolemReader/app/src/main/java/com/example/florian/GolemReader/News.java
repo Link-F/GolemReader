@@ -31,6 +31,11 @@ public class News {
     }
 
     public JSONArray data = new JSONArray();
+    Context context;
+
+    News(Context context){
+        this.context = context;
+    }
 
     public class worker extends AsyncTask<Void, Void, String> {
 
@@ -44,6 +49,14 @@ public class News {
 
         @Override
         protected String doInBackground(Void... params) {
+
+            try {
+                get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
             try {
 
 
@@ -84,7 +97,9 @@ public class News {
     }
 
     public Article[] getLatestNews() throws JSONException, ExecutionException, InterruptedException {
+
         worker myworker = new worker(this.api_key, this.articles);
+
         JSONObject json = new JSONObject(myworker.execute().get());
         this.data = json.getJSONArray("data");
 

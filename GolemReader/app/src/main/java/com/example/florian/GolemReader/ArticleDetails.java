@@ -94,7 +94,9 @@ public class ArticleDetails extends AppCompatActivity {
             try {
 
                 HttpClient client = new DefaultHttpClient();
+
                 URI website = new URI("http://api.golem.de/api/article/meta/"+article_id+"/?key="+this.api_key+"&format=json");
+
                 HttpGet request = new HttpGet();
                 request.setURI(website);
 
