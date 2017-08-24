@@ -1,5 +1,21 @@
 apply plugin: 'com.android.application'
 
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.0'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -7,7 +23,7 @@ android {
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
-        applicationId "com.example.florian.bung"
+        applicationId "com.example.florian.GolemReader"
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 1

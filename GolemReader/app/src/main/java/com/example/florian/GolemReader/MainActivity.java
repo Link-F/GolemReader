@@ -95,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
             // Die Bild URL als Tag setzen
             imageViews[i].setTag(latest_articles[i].image_url);
 
+            Log.d(TAG,"!!!Image URL::::::"+latest_articles[i].image_url);
+
+
             // Das Bild mit dem Worker runterladen und in den ImageView setzen
             ImageLoad task = new ImageLoad();
             task.execute(imageViews[i]);
