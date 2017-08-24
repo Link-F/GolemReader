@@ -1,5 +1,7 @@
 package com.example.florian.GolemReader;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -23,16 +25,35 @@ public class News {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     public JSONArray data = new JSONArray();
+    Context context;
+
+    News(Context context){
+        this.context = context;
+    }
 
     public class worker extends AsyncTask<Void, Void, String> {
-        worker() {
+
+        public String api_key;
+        public String articles;
+
+        worker(String api_key, String articles) {
+            this.api_key = api_key;
+            this.articles = articles;
         }
 
         @Override
         protected String doInBackground(Void... params) {
+
+            try {
+                get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
             try {
                 HttpClient client = new DefaultHttpClient();
-                URI website = new URI("http://api.golem.de/api/article/latest/15/?key=6ea752bf080139b5507ef7b6245dc710&format=json");
+                URI website = new URI("http://api.golem.de/api/article/latest/"+this.articles+"/?key="+this.api_key+"&format=json");
                 HttpGet request = new HttpGet();
                 request.setURI(website);
                 HttpResponse response = client.execute(request);
@@ -69,7 +90,12 @@ public class News {
     }
 
     public Article[] getLatestNews() throws JSONException, ExecutionException, InterruptedException {
-        worker myworker = new worker();
+
+        String api_key = context.getString(R.string.api_key);
+        String articles = context.getString(R.string.articles);
+
+        worker myworker = new worker(api_key, articles);
+
         JSONObject json = new JSONObject(myworker.execute().get());
         this.data = json.getJSONArray("data");
 
@@ -80,12 +106,8 @@ public class News {
         for (int i = 0; i < this.data.length(); i++) {
             JSONObject temp = this.data.getJSONObject(i);
 
-            Log.d(TAG, "!!article.headline=" + temp.getString("headline"));
-
             // Load the image object inside the article object
             JSONObject image = temp.getJSONObject("leadimg");
-
-            Log.d(TAG,"!!!!!!!!!!!!!!!ID:" + Integer.toString(temp.getInt("articleid")));
 
             // Build an array of articles out of all articles
             latestArticle[i] = new Article(

@@ -55,8 +55,9 @@ public class ArticleDetails extends AppCompatActivity {
         }
 
         // Set the WebView url
-        WebView Web = (WebView) findViewById(R.id.WebView);
-        Web.loadUrl(article.url);
+        WebView webview = (WebView) findViewById(R.id.WebView);
+        setContentView(webview);
+        webview.loadUrl(article.url);
 
         new CountDownTimer(500, 1000) {
 
@@ -82,7 +83,7 @@ public class ArticleDetails extends AppCompatActivity {
         protected String doInBackground(Void... params) {
             try {
                 HttpClient client = new DefaultHttpClient();
-                URI website = new URI("http://api.golem.de/api/article/meta/"+article_id+"/?key=6ea752bf080139b5507ef7b6245dc710&format=json");
+                URI website = new URI("http://api.golem.de/api/article/meta/"+article_id+"/?key="+R.string.api_key+"&format=json");
                 HttpGet request = new HttpGet();
                 request.setURI(website);
 
@@ -104,7 +105,6 @@ public class ArticleDetails extends AppCompatActivity {
             return "Fehler";
         }
 
-
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
@@ -114,7 +114,6 @@ public class ArticleDetails extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
         }
     }
 
