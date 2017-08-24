@@ -7,9 +7,14 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class ImageLoad extends AsyncTask<ImageView, Void, Bitmap> {
 
@@ -32,15 +37,22 @@ public class ImageLoad extends AsyncTask<ImageView, Void, Bitmap> {
         imageView.setImageBitmap(result);
     }
 
-    // Load the image from the url
     private Bitmap download_Image(String url) {
 
         Bitmap bmp = null;
+
         try {
-            URL ulrn = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) ulrn.openConnection();
-            InputStream is = con.getInputStream();
-            bmp = BitmapFactory.decodeStream(is);
+            HttpClient client = new DefaultHttpClient();
+            HttpGet request = new HttpGet(url);
+            HttpResponse response;
+
+            response = (HttpResponse)client.execute(request);
+            HttpEntity entity = response.getEntity();
+            BufferedHttpEntity bufferedEntity = new BufferedHttpEntity(entity);
+            InputStream inputStream = bufferedEntity.getContent();
+
+            bmp = BitmapFactory.decodeStream(inputStream);
+
             if (null != bmp)
                 return bmp;
 
