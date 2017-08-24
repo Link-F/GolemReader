@@ -16,7 +16,7 @@ News Reader for golem.de
 <p>Create your key on "http://api.golem.de/doc/manual/de/basic/devkey"</p>
 <p>Put the key inside the file "Strings.xml" under <b>app->res->values->strings.xml</b>
 <p>Example:</p>
-<b> <p>// ------------- Set here your key for the golem api ---------------</p>
-<p> &lt;string name="api_key"&lt;xxxxxxxxxxxxxxxxxxxxxxxxxx&lt;/string&lt;</p>
-</b>
+<p>// ------------- Set here your key for the golem api ---------------</p>
+<p> &lt;string name="api_key"&gt;xxxxxxxxxxxxxxxxxxxxxxxxxx&lt;/string&gt;</p>
+
 <h1>
