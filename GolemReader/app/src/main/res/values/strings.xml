@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">GolemReader</string>
+
+    // Number of articles
+    <string name="articles">20</string>
+
+    // ------------- Set here your key for the golem api ---------------
+    <string name="api_key">6ea752bf080139b5507ef7b6245dc710</string>
+</resources>
