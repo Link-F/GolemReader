@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Gravity;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,7 +31,6 @@ import java.util.concurrent.ExecutionException;
 
 public class ArticleDetails extends AppCompatActivity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
     public Article article;
 
     @Override
@@ -41,16 +41,7 @@ public class ArticleDetails extends AppCompatActivity {
         pDialog.setMessage("Loading Article ....");
         pDialog.show();
 
-        // Referenz auf Layout holen
-        LinearLayout layout = (LinearLayout)findViewById(R.id.LinearLayout);
-        layout.setOrientation(LinearLayout.VERTICAL);
-
-
-        TextView contentview = new TextView(this);
-        TextView headview = new TextView(this);
-        ImageView image = new ImageView(this);
-
-
+        // Get the article by article_id
         try {
             Intent intent = getIntent();
             int article_id = intent.getIntExtra("article_id", 0);
@@ -63,61 +54,20 @@ public class ArticleDetails extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-        // Eigenschaften des Image View setzen
-        LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(
-                article.image_width*3,
-                article.image_height*3);
-
-        layoutParams.gravity= Gravity.CENTER;
-        image.setLayoutParams(layoutParams);
-
-
-        // View Parameter
-        contentview.setSingleLine(false);
-        headview.setSingleLine(false);
-        //view.setBackgroundResource(R.drawable.row_border);
-
-
-        // Die Bild URL als Tag setzen
-        image.setTag(article.image_url);
-
-        // Das Bild mit dem Worker runterladen und in den ImageView setzen
-        ImageLoad task = new ImageLoad();
-        task.execute(image);
-
-
-        // extview EigenschaftenT
-        headview.setText(article.headline);
-        headview.setTextSize(20);
-        headview.setGravity(Gravity.CENTER);
-
-        contentview.setText(article.subheadline + "\n\n\n" + article.abstract_text);
-        contentview.setGravity(Gravity.CENTER);
-
-        // Viewws in das Layout setzen
-        layout.addView(image);
-        layout.addView(headview);
-        layout.addView(contentview);
-
-        final TextView link = new TextView(this);
-        link.setText(article.url);
-        Linkify.addLinks(link, Linkify.WEB_URLS);
-
-        link.setGravity(Gravity.CENTER);
-        layout.addView(link);
-
+        // Set the WebView url
+        WebView Web = (WebView) findViewById(R.id.WebView);
+        Web.loadUrl(article.url);
 
         new CountDownTimer(500, 1000) {
 
             @Override
-            public void onTick(long millisUntilFinished) {
-                // Tue nichts
+            public void onTick(long milliseconds) {
+                // Do nothing
             }
 
             @Override
             public void onFinish() {
-                // Ladebalken beenden
+                // End the load bar
                 pDialog.dismiss();
 
             }
@@ -159,10 +109,8 @@ public class ArticleDetails extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             try {
-
-                // JSON Objekt aus den geladenem JSON erstellen
+                // Create a json object from the json text
                 JSONObject object = new JSONObject(s);
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -176,52 +124,13 @@ public class ArticleDetails extends AppCompatActivity {
         myworker.article_id = article_id;
 
         JSONObject object = new JSONObject(myworker.execute().get());
-        //JSONArray data = json.getJSONArray("data");
 
         JSONObject temp = object.getJSONObject("data");
 
-        Log.d(TAG,"!!!DEBUGasdfasdf:"+ temp.getString("headline"));
-
-
-        // Pro JSONObjekt gibt es nochmals ein JSONObjekt mit den Bildinformationen
+        // Get the image object inside the data object
         JSONObject image = temp.getJSONObject("leadimg");
 
-        //JSONArray image_arr = temp.getJSONArray("leadimg");
-
-
-        /*if(Boolean.parseBoolean(String.valueOf(image_arr.length()))) {
-
-            int[] width_arr = new int[image_arr.length()];
-            int[] height_arr = new int[image_arr.length()];
-            String[] image_url_arr = new String[image_arr.length()];
-
-            for (int i = 0; i < image_arr.length(); i++) {
-
-                JSONObject image_obj = image_arr.getJSONObject(i);
-
-                width_arr[i] = Integer.parseInt(image_obj.getString("width"));
-                height_arr[i] = Integer.parseInt(image_obj.getString("height"));
-                image_url_arr[i] = image_obj.getString("url");
-            }
-            // Aus diesen ganzen Daten wird nun ein Article Objekt zusammengebaut
-            Article article = new Article(temp.getInt("articleid"),
-                    temp.getString("headline"),
-                    temp.getString("subheadline"),
-                    temp.getString("abstracttext"),
-                    temp.getString("url"),
-                    temp.getString("date"),
-                    image_url_arr,
-                    width_arr,
-                    height_arr,
-                    Integer.parseInt(temp.getString("pages"))
-            );
-            Log.d(TAG,"!!!Debug"+article.headline);
-            this.article = article;
-        }
-        else
-        {*/
-
-            // Aus diesen ganzen Daten wird nun ein Article Objekt zusammengebaut
+            // Build an article object from the data
             Article article = new Article(temp.getInt("articleid"),
                     temp.getString("headline"),
                     temp.getString("subheadline"),

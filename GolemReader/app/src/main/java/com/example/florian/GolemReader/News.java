@@ -19,9 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
-/**
- * Created by florian on 17.05.16.
- */
 public class News {
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -38,9 +35,7 @@ public class News {
                 URI website = new URI("http://api.golem.de/api/article/latest/15/?key=6ea752bf080139b5507ef7b6245dc710&format=json");
                 HttpGet request = new HttpGet();
                 request.setURI(website);
-
                 HttpResponse response = client.execute(request);
-
                 HttpEntity e = response.getEntity();
 
                 JSONObject object = new JSONObject(EntityUtils.toString(e));
@@ -62,13 +57,8 @@ public class News {
             super.onPostExecute(s);
             try {
 
-                // JSON Objekt aus den geladenem JSON erstellen
+                // Create Json object
                 JSONObject object = new JSONObject(s);
-
-                /*String Success = object.getString("success");
-                if ( Success == "true" ){
-                    text.setText("\n\nKein Artikel gefunden");
-                }*/
 
                 data = object.getJSONArray("data");
             } catch (JSONException e) {
@@ -78,27 +68,28 @@ public class News {
         }
     }
 
-
     public Article[] getLatestNews() throws JSONException, ExecutionException, InterruptedException {
         worker myworker = new worker();
         JSONObject json = new JSONObject(myworker.execute().get());
         this.data = json.getJSONArray("data");
 
-        Log.d(TAG, "!!myworker.data.length=" + data.length());
-        // Article Array von der Größe des Data Arrays
         Article[] latestArticle = new Article[this.data.length()];
 
+        // Loop through all json objects
+        // Every object is a article
         for (int i = 0; i < this.data.length(); i++) {
-            // Pro Schleifendurchgang ein JSONObjekt aus dem JSONArray holen
             JSONObject temp = this.data.getJSONObject(i);
 
-            Log.d(TAG,"!!article.headline="+temp.getString("headline"));
+            Log.d(TAG, "!!article.headline=" + temp.getString("headline"));
 
-            // Pro JSONObjekt gibt es nochmals ein JSONArray mit den Bildinformationen
+            // Load the image object inside the article object
             JSONObject image = temp.getJSONObject("leadimg");
 
-            // Aus diesen ganzen Daten wird nun ein Article Objekt zusammengebaut
-            latestArticle[i] = new Article(temp.getInt("articleid"),
+            Log.d(TAG,"!!!!!!!!!!!!!!!ID:" + Integer.toString(temp.getInt("articleid")));
+
+            // Build an array of articles out of all articles
+            latestArticle[i] = new Article(
+                    temp.getInt("articleid"),
                     temp.getString("headline"),
                     temp.getString("abstracttext"),
                     temp.getString("url"),
@@ -107,12 +98,9 @@ public class News {
                     Integer.parseInt(image.getString("width")),
                     Integer.parseInt(image.getString("height"))
             );
-            // Pro Schleifendurchlauf wird ein Article Objekt erstellt und in das latestArticle Array beigefügt
-
-        Log.d(TAG,"!!!!!!headline:"+latestArticle[i].headline);
         }
+        // Return the array of articles
         return latestArticle;
-
     }
 }
 

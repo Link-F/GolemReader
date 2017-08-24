@@ -18,24 +18,21 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     Article[] latest_articles = new Article[5];
-    // Asynchroner Worker der ein Artikelbild runterlädt
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-            // Die neuesten Artikel in die latest_articles Klassenvariable schreiben
+            // Load the newest articles
             News news = new News();
         try {
-            // Die neuesten Artikel werden geladen und als Mitgliedsvariable gespeichert
-            latest_articles = news.getLatestNews();
+            // Save the newest articles in latest_articles
+            this.latest_articles = news.getLatestNews();
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -43,19 +40,19 @@ public class MainActivity extends AppCompatActivity {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        // Lineares Layout Referenz holen
+
+        // Load references of the layout
         LinearLayout container = (LinearLayout) findViewById(R.id.linearlayout);
         container.setOrientation(LinearLayout.VERTICAL);
 
-
-        // Arrays der Layout Elemente
+        // Arrays of the layout elements
         LinearLayout[] temp  = new LinearLayout[latest_articles.length];
         LinearLayout[] layout = new LinearLayout[latest_articles.length];
         TextView[] headviews = new TextView[latest_articles.length];
         TextView[] contentviews = new TextView[latest_articles.length];
         ImageView[] imageViews = new ImageView[latest_articles.length];
 
-        // Die Arrays mit Instanzen füllen
+        // Fill the layout arrays with instances
         for(int x =0; x < latest_articles.length; x++){
             layout[x] = new LinearLayout(this);
             layout[x].setOrientation(LinearLayout.VERTICAL);
@@ -68,41 +65,33 @@ public class MainActivity extends AppCompatActivity {
 
         for(int i =0; i<latest_articles.length;i++){
 
-            // ID der Reihe setzen
+            // Set the id of the rows
             contentviews[i].setId(latest_articles[i].article_id);
             contentviews[i].setSingleLine(false);
             layout[i].setBackgroundResource(R.drawable.row_border);
 
-            // Ein Clicklistener auf den View setzen
+            // Set a click listener on the contentview
             contentviews[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getApplicationContext(), ArticleDetails.class);
                     Log.d(TAG,"!!!Artikel ID Übergabe"+v.getId());
-                    // Artikel id an die nächste Activity weitergeben
-                    intent.putExtra("article_id",v.getId());
+                    // Give the article id to the next activity
+                    intent.putExtra("article_id", v.getId());
 
-                    // Startet die ViewTrack Activity
+                    // Start the new activity
                     startActivity(intent);
                 }
             });
 
-            RelativeLayout.LayoutParams params=new RelativeLayout.LayoutParams
-                    (RadioGroup.LayoutParams.WRAP_CONTENT,
-                            RadioGroup.LayoutParams.WRAP_CONTENT);
-
-
-            // Die Bild URL als Tag setzen
+            // Set the image URl as tag
             imageViews[i].setTag(latest_articles[i].image_url);
 
-            Log.d(TAG,"!!!Image URL::::::"+latest_articles[i].image_url);
-
-
-            // Das Bild mit dem Worker runterladen und in den ImageView setzen
-            ImageLoad task = new ImageLoad();
+            // Load the picture with the worker and set it in ImageView
+            ImageLoad task = new ImageLoad(imageViews[i].getTag().toString());
             task.execute(imageViews[i]);
 
-            // Höhe und Breite des Artikelbildes setzen
+            // Set the width and height of the image
             android.view.ViewGroup.LayoutParams layoutParams = new ActionBar.LayoutParams(
                     latest_articles[i].image_width,
                     latest_articles[i].image_height);
@@ -111,28 +100,26 @@ public class MainActivity extends AppCompatActivity {
             imageViews[i].setLayoutParams(layoutParams);
             imageViews[i].setPadding(5,5,5,5);
 
-            // Den Unix timestamp aus dem Artikel in ein Datum umwandeln
+            // Convert the unix timestamp in SimpleDateFormat
             Date date = new Date(Integer.parseInt(latest_articles[i].date)*1000L);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
             sdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
             String formattedDate = sdf.format(date);
 
-            // Texte in die Views setzen
+            // Set text in views
             headviews[i].setText(latest_articles[i].headline);
             headviews[i].setTextSize(16);
             contentviews[i].setText(latest_articles[i].abstract_text + "\n\n" + formattedDate);
             contentviews[i].setPadding(5,5,5,5);
 
-
-
-            // Den Headview und das Image in das horizontale Lineare Layout setzen
+            // Set the headview and imageView in horizontal linear layout
             temp[i].addView(imageViews[i]);
             temp[i].addView(headviews[i]);
 
-            // Das vertikale Lineare Layout in das vertikale Lineare Layout setzen
+            // Set the vertical layout in the horizontal linear layout
             layout[i].addView(temp[i]);
 
-            // das Lineare vertikale Layout in den Scrollview setzen
+            // Set the linear vertical layout in the scroll view
             layout[i].addView(contentviews[i]);
             container.addView(layout[i]);
         }
