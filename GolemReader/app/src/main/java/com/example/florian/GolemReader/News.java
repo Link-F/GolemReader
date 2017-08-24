@@ -46,7 +46,6 @@ public class News {
         protected String doInBackground(Void... params) {
             try {
 
-
                 HttpClient client = new DefaultHttpClient();
                 URI website = new URI("http://api.golem.de/api/article/latest/"+this.articles+"/?key="+this.api_key+"&format=json");
                 HttpGet request = new HttpGet();
