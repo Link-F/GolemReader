@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
             // Load the newest articles
-            News news = new News();
+            News news = new News(this);
         try {
             // Save the newest articles in latest_articles
             this.latest_articles = news.getLatestNews();

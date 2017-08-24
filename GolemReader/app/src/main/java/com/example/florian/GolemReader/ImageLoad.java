@@ -1,21 +1,25 @@
 package com.example.florian.GolemReader;
 
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 import android.widget.ImageView;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.InputStream;
 
+@TargetApi(Build.VERSION_CODES.CUPCAKE)
 public class ImageLoad extends AsyncTask<ImageView, Void, Bitmap> {
 
     ImageView imageView = null;
