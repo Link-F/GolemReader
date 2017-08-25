@@ -22,3 +22,7 @@ News Reader for golem.de
 </code>
 <hr>
 <h1>
+
+<h1>Application</h1>
+
+![alt text](https://github.com/Link-F/GolemReader/blob/master/example.png)
