@@ -75,7 +75,6 @@ public class ArticleDetails extends AppCompatActivity {
             public void onFinish() {
                 // End the load bar
                 pDialog.dismiss();
-
             }
         }.start();
     }
